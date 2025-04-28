@@ -56,7 +56,7 @@ export default function TodoList() {
 
 
     useEffect(()=>{
-        const storageTodos = JSON.parse(localStorage.getItem("todos"))
+        const storageTodos = JSON.parse(localStorage.getItem("todos")) ?? []
         setTodos(storageTodos )
     },[])
     function changDisplayedTodosType(e){
@@ -117,7 +117,7 @@ export default function TodoList() {
                     </ToggleButtonGroup>
                     {/* === // FILTER BUTTONS // === */}
 
-                {/* === ALL TODOS === */}
+                {/* === ALL TODOS === */} 
                 {todosJsx}
                 {/* <Todo /> */}
                 {/* === // ALL TODOS // === */}
