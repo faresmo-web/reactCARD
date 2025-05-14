@@ -1,26 +1,22 @@
-import React from 'react'
+
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
-import Button from '@mui/material/Button'; 
 // == ICONS ==
 import CheckIcon from '@mui/icons-material/Check';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import ModeEditOutlinedIcon from '@mui/icons-material/ModeEditOutlined';
 // == // ICONS // ==
-import { useContext, useState } from 'react';
-import { TodosContext } from '../contexts/TodosContext';
-// import { v4 as uuidv4 } from 'uuid';
+import { useTodoDispatch } from '../contexts/TodosContext';
+import { useToast } from '../contexts/ToastContext';
 export default function Todo({todo, showDelete, showUpdate}){
     // === MODAL ===
-    
-    const [updateTodo, setUpdateTodo] = useState({title: todo.title, details: todo.details})
     function handleDeletClick(){
         showDelete(todo)
     }
+    const { showHideToast } = useToast()
     function handleUpdateClick(){
         showUpdate(todo)
     }
@@ -29,27 +25,14 @@ export default function Todo({todo, showDelete, showUpdate}){
 
 
 
-    const { todos, setTodos} = useContext(TodosContext)
+    
+    const dispatch = useTodoDispatch()
     function handleCheckClick(){
-        const updatedTodos = todos.map((t)=>{
-            if(t.id == todo.id){
-                // if(t.isCompleted == true){
-                //     t.isCompleted = false
-                // }else{
-                //     t.isCompleted = true
-                // }
-                t.isCompleted = !t.isCompleted
-            }
-            return t
-        })
-        setTodos(updatedTodos)
-        localStorage.setItem("todos", JSON.stringify(updatedTodos))
-
+        dispatch({type: "completed", payload: todo})
+        showHideToast("تم التعديل بنجاح")
     }
     return(
     <>
-        
-        
         <Card sx={{ minWidth: 275, backgroundColor: "#283593", color: "#FFF", marginTop: 5 }} className='todoCard' >
             <CardContent>
                 

@@ -1,10 +1,13 @@
 
 import './App.css'
 import TodoList from './components/TodoList'
+import MySnackBar from './components/MySnackBar';
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { TodosContext } from './contexts/TodosContext';
 import { v4 as uuidv4 } from 'uuid';
 import { useState } from 'react';
+import { ToastProvider } from './contexts/ToastContext';
+import TodosProvider from './contexts/TodosContext';
 
 
 const initialTodos = [
@@ -41,28 +44,34 @@ const theme = createTheme({
     },
     error: {
       main: "#d50000",
-    },
+    },       
   }
 });
 
 function App() {
   const [todos, setTodos] = useState(initialTodos)
+ 
+  
   return (
     
     <ThemeProvider theme={theme}>
-      <div style={{
-        direction: "rtl",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#191b1f",
-        height: "100vh",
-      }}>
-        <TodosContext.Provider value={{ todos, setTodos }}>
-          <TodoList />
-        </TodosContext.Provider>
-      
-      </div>
+      <TodosProvider>
+        <ToastProvider >
+          <div style={{
+            direction: "rtl",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#191b1f",
+            height: "100vh",
+          }}> 
+            
+              <TodoList />
+            
+          
+          </div>
+        </ToastProvider> 
+      </TodosProvider>
     </ThemeProvider>
     
     

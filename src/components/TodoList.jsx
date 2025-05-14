@@ -12,10 +12,13 @@ import TextField from '@mui/material/TextField';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 // === COMPONENTS ===
 import Todo from './Todo';
+
 // === OTHER ===
-import { TodosContext } from '../contexts/TodosContext';
-import { useContext, useState, useEffect, useMemo } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import { useTodos, useTodoDispatch } from '../contexts/TodosContext';
+import { useToast } from '../contexts/ToastContext';
+
+import {useState, useEffect, useMemo } from 'react';
+
 // == MODAL ==
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -23,7 +26,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
-// import TextField from '@mui/material/TextField';
+;
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -35,8 +38,12 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 
 export default function TodoList() {
-  
-    const { todos, setTodos} = useContext(TodosContext)
+
+    const todos = useTodos()
+    const dispatch = useTodoDispatch()
+
+    const {showHideToast} = useToast()
+    
     const [modalTodo, setModalTodo] = useState(null)
     const [open, setOpen] = useState(false)
     const [update, setUpdate] = useState(false)
@@ -82,8 +89,7 @@ export default function TodoList() {
 
 
     useEffect(()=>{
-        const storageTodos = JSON.parse(localStorage.getItem("todos")) ?? []
-        setTodos(storageTodos )
+        dispatch({type: "get"})
     },[])
 
 
@@ -96,17 +102,9 @@ export default function TodoList() {
     }
 
     function handlAddClick(){
-        const newTodo = {
-            id: uuidv4(),
-            title: titleInput,
-            details: "",
-            isCompleted: false
-
-        }
-        const updatedTodos = [...todos, newTodo]
-        setTodos(updatedTodos)
-        localStorage.setItem("todos", JSON.stringify(updatedTodos))
+        dispatch({type: "addad", payload: {title: titleInput}})
         setTitleInput("")
+        showHideToast(" تم إضافة المهمة بنجاح ")
     }
 
 
@@ -131,12 +129,9 @@ export default function TodoList() {
     }
     function handleDeleteConfirm(){
         // console.log(modalTodo)
-        const updatedTodos = todos.filter((t)=>{
-            return t.id != modalTodo.id
-        })
-        setTodos(updatedTodos)
-        localStorage.setItem("todos", JSON.stringify(updatedTodos))
+        dispatch({type: "delete", payload: {id: modalTodo.id}})
         setOpen(false)
+        showHideToast("تم الحذف بنجاح")
     }
 
     function handleUpdateModalClose(){
@@ -144,16 +139,9 @@ export default function TodoList() {
         }
         
         function handleUpdateConfirm(){
-            const updatedTodos = todos.map((t)=>{
-                if(t.id == modalTodo.id){
-                    return{...t, title: modalTodo.title, details: modalTodo.details}
-                }else{
-                    return t
-                }
-            })
-            setTodos(updatedTodos)
+            dispatch({type: "updated", payload: modalTodo})
             setUpdate(false)
-            localStorage.setItem("todos", JSON.stringify(updatedTodos))
+            showHideToast("تم التحديث بنجاح")
         }
 
     const todosJsx = todosToBeRendered.map((t)=>{
@@ -205,7 +193,7 @@ export default function TodoList() {
                     fullWidth
                     variant="standard"
                     value={modalTodo?.title}
-                    onChange={(e)=>{
+                    onChange={(e)=>{ 
                         setModalTodo({...modalTodo, title: e.target.value})
                     }}
                 />
